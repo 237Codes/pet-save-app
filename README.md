@@ -1,3 +1,11 @@
+## Project Name: Pet-Save
+## Project Contributors
+<ol>
+ <li>Manyaka Anjorin</li>
+ <li>Iyanuoluwa Joanna Ahmed </li>
+ <li>Mamata Thapa</li>
+ <li>Tayyab Ali</li>
+</ol>
 
 ## Brief Description
 A Pet Save Platform which is a community-driven app where users can report lost and found pets, helping reunite them with their owners. Users can upload photos, and specify details such as breed and last seen location, and the platform uses AI to classify pets by species and estimate their weight and breed. The app also provides a matching system that suggests potential connections between lost and found pets based on image analysis. Users earn rewards for reporting pets and successfully helping to reunite them with their owners, incentivizing engagement. The platform aims to streamline the process of finding lost pets and offering assistance.
