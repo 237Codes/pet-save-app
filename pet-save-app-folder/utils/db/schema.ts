@@ -14,7 +14,7 @@ export const Reports = pgTable("reports", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => Users.id).notNull(),
   location: text("location").notNull(),
-  species: varchar("species", { length:100 }).notNull(),
+  breed: varchar("breed", { length:100 }).notNull(),
   weight: varchar("weight", { length:100 }).notNull(),
   imageUrl: text("image_url"),
   verificationResult: jsonb("verification_result"),
