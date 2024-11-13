@@ -8,7 +8,7 @@ import {inter} from 'next/font/google'
 
 import {Toaster} from 'react-hot-toast'
 
-const inter = Inter({ subsets: ['latin']}})
+const inter = Inter({ subsets: ['latin']})
 
 export default function RootLayout({
   children,
@@ -17,6 +17,8 @@ export default function RootLayout({
 }) {
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [totalEarnings, setTotalEarnings] = useState(0)
+
+    //useEffect
 
     return (
       <html lang='en'>
@@ -29,12 +31,13 @@ export default function RootLayout({
                 {children}
                 </main>
               </div>
+              
           </div>
           <Toaster/>
         </body>
       </html>
     )
-    
+}  
 
 /*
 import type { Metadata } from "next";
