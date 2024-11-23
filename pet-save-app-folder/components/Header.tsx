@@ -38,7 +38,7 @@ const privateKeyProvider = new EthereumPrivateKeyProvider({
 
 const web3auth = new Web3Auth({
   clientId,
-  web3AuthNetwork: WEB3AUTH_NETWORK.TESTNET, // Changed from SAPPHIRE_MAINNET to TESTNET
+  web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET , // Changed from SAPPHIRE_MAINNET to TESTNET sapphire_devnet
   privateKeyProvider,
 });
 
@@ -48,6 +48,7 @@ interface HeaderProps {
 }
 
 export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
+  const [isWalletInitialized, setIsWalletInitialized] = useState(false);
   const [provider, setProvider] = useState<IProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -80,6 +81,7 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
             }
           }
         }
+        setIsWalletInitialized(true); // Set the state to true when the wallet is ready
       } catch (error) {
         console.error("Error initializing Web3Auth:", error);
       } finally {
@@ -138,8 +140,8 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
 
   // Function to log in the user
   const login = async () => {
-    if (!web3auth) {
-      console.log("web3auth not initialized yet");
+    if (!isWalletInitialized) {
+      console.error('Wallet is not ready yet, Login modal is not initialized');
       return;
     }
     try {
