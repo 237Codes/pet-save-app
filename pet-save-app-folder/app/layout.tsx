@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react"
 import { Inter } from 'next/font/google'
 import "./globals.css"
-import Header from "@/components/Header"
-import Sidebar from "@/components/Sidebar"
+// import Header from "@/components/Header"
+// import Sidebar from "@/components/Sidebar"
 import 'leaflet/dist/leaflet.css'
 import { Toaster } from 'react-hot-toast'
-import { getAvailableRewards, getUserByEmail } from '@/utils/db/actions'
+import { getAvailableRewards, getUserByEmail } from '@/utils/db/action'
 
+// This is how to initialize the itnter font
 const inter = Inter({ subsets: ['latin'] })
 
 export default function RootLayout({
@@ -16,8 +17,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [totalEarnings, setTotalEarnings] = useState(0)
+  const [sidebarOpen, setSidebarOpen] = useState(false) // Sidebar is closed by default
+  const [totalEarnings, setTotalEarnings] = useState(0) // Total earnings is 0 by default
 
   useEffect(() => {
     const fetchTotalEarnings = async () => {
