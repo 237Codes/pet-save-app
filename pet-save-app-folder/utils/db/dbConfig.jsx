@@ -5,5 +5,7 @@ import * as schema from "./schema";
 
 // Create a new Neon instance with the connection string
 
-const sql = neon(process.env.DATABASE_URL);
+const sql = neon(
+    process.env.DATABASE_URL
+);
 export const db = drizzle(sql, { schema });

@@ -25,8 +25,8 @@ export async function getUserByEmail(email: string) {
 export async function createReport(
   userId: number,
   location: string,
-  wasteType: string,
-  amount: string,
+  breed: string,
+  weight: string,
   imageUrl?: string,
   type?: string,
   verificationResult?: any
@@ -37,8 +37,8 @@ export async function createReport(
       .values({
         userId,
         location,
-        wasteType,
-        amount,
+        breed,
+        weight,
         imageUrl,
         verificationResult,
         status: "pending",
@@ -217,14 +217,14 @@ export async function getRecentReports(limit: number = 10) {
   }
 }
 
-export async function getWasteCollectionTasks(limit: number = 20) {
+export async function getPetCollectionTasks(limit: number = 20) {
   try {
     const tasks = await db
       .select({
         id: Reports.id,
         location: Reports.location,
-        wasteType: Reports.wasteType,
-        amount: Reports.amount,
+        wasteType: Reports.breed,
+        amount: Reports.weight,
         status: Reports.status,
         date: Reports.createdAt,
         collectorId: Reports.collectorId,
@@ -238,7 +238,7 @@ export async function getWasteCollectionTasks(limit: number = 20) {
       date: task.date.toISOString().split('T')[0], // Format date as YYYY-MM-DD
     }));
   } catch (error) {
-    console.error("Error fetching waste collection tasks:", error);
+    console.error("Error fetching pet collection tasks:", error);
     return [];
   }
 }
@@ -249,8 +249,8 @@ export async function saveReward(userId: number, amount: number) {
       .insert(Rewards)
       .values({
         userId,
-        name: 'Waste Collection Reward',
-        collectionInfo: 'Points earned from waste collection',
+        name: 'Pet Collection Reward',
+        collectionInfo: 'Points earned from Pet collection',
         points: amount,
         level: 1,
         isAvailable: true,
@@ -259,7 +259,7 @@ export async function saveReward(userId: number, amount: number) {
       .execute();
     
     // Create a transaction for this reward
-    await createTransaction(userId, 'earned_collect', amount, 'Points earned for collecting waste');
+    await createTransaction(userId, 'earned_collect', amount, 'Points earned for collecting a pet');
 
     return reward;
   } catch (error) {
@@ -268,9 +268,9 @@ export async function saveReward(userId: number, amount: number) {
   }
 }
 
-export async function saveCollectedWaste(reportId: number, collectorId: number, verificationResult: any) {
+export async function saveCollectedPet(reportId: number, collectorId: number, verificationResult: any) {
   try {
-    const [collectedWaste] = await db
+    const [collectedPet] = await db
       .insert(CollectedPets)
       .values({
         reportId,
@@ -280,9 +280,9 @@ export async function saveCollectedWaste(reportId: number, collectorId: number, 
       })
       .returning()
       .execute();
-    return collectedWaste;
+    return collectedPet;
   } catch (error) {
-    console.error("Error saving collected waste:", error);
+    console.error("Error saving collected pet:", error);
     throw error;
   }
 }
@@ -342,8 +342,8 @@ export async function getRewardTransactions(userId: number) {
       })
       .from(Transactions)
       .where(eq(Transactions.userId, userId))
-      .orderBy(desc(Transactions.date))
-      .limit(10)
+      .orderBy(desc(Transactions.date)) // Order by date in descending order
+      .limit(10) // Limit to 10 most recent transactions
       .execute();
 
     console.log('Raw transactions from database:', transactions)
@@ -470,8 +470,10 @@ export async function redeemReward(userId: number, rewardId: number) {
 }
 
 export async function getUserBalance(userId: number): Promise<number> {
-  const transactions = await getRewardTransactions(userId);
-  const balance = transactions.reduce((acc, transaction) => {
+  const transactions = await getRewardTransactions(userId) || [];
+
+  if(!transactions) return 0;
+  const balance = transactions.reduce((acc:number, transaction:any) => {
     return transaction.type.startsWith('earned') ? acc + transaction.amount : acc - transaction.amount
   }, 0);
   return Math.max(balance, 0); // Ensure balance is never negative

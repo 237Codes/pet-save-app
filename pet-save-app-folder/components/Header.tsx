@@ -17,9 +17,9 @@ import { Web3Auth } from "@web3auth/modal"
 import { CHAIN_NAMESPACES, IProvider, WEB3AUTH_NETWORK } from "@web3auth/base"
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider"
 import { useMediaQuery } from "@/hooks/useMediaQuery"
-import { createUser, getUnreadNotifications, markNotificationAsRead, getUserByEmail, getUserBalance } from "@/utils/db/actions"
+import { createUser, getUnreadNotifications, markNotificationAsRead, getUserByEmail, getUserBalance } from "@/utils/db/action"
 //SEE .ENV FILE FOR CLIENT ID
-const clientId = process.env.WEB3_AUTH_CLIENT_ID //"BJKdDFkNtkWX87XqkuWrDu4rbkSvWyQZ5lswS0ucINxxcN0inRVW8zzKAywPPzgiOHP7_3PcfFwfpvcQvSdaLRs";
+const clientId = "BODUNkVDD5irbMv3goaxWKI9_M31T-xnRFUGEZzQJIaDC2WHCYq-DuEIGuchivxdyTksNgo1yTLXUx94FoEirgk"//process.env.WEB3_AUTH_CLIENT_ID //"BJKdDFkNtkWX87XqkuWrDu4rbkSvWyQZ5lswS0ucINxxcN0inRVW8zzKAywPPzgiOHP7_3PcfFwfpvcQvSdaLRs";
 
 const chainConfig = {
   chainNamespace: CHAIN_NAMESPACES.EIP155,
@@ -59,6 +59,7 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
 
   console.log('user info', userInfo);
   
+  // Use Effect that initializes the web3 auth 
   useEffect(() => {
     const init = async () => {
       try {
@@ -89,6 +90,7 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
     init();
   }, []);
 
+  //Use effect that fetches notifications from database
   useEffect(() => {
     const fetchNotifications = async () => {
       if (userInfo && userInfo.email) {
@@ -108,6 +110,7 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
     return () => clearInterval(notificationInterval);
   }, [userInfo]);
 
+  // Use effect that fetches user balance from database
   useEffect(() => {
     const fetchUserBalance = async () => {
       if (userInfo && userInfo.email) {
@@ -133,6 +136,7 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
     };
   }, [userInfo]);
 
+  // Function to log in the user
   const login = async () => {
     if (!web3auth) {
       console.log("web3auth not initialized yet");
@@ -158,6 +162,7 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
     }
   };
 
+  // Function to log out the user
   const logout = async () => {
     if (!web3auth) {
       console.log("web3auth not initialized yet");
@@ -211,8 +216,8 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
           <Link href="/" className="flex items-center">
             <Leaf className="h-6 w-6 md:h-8 md:w-8 text-green-500 mr-1 md:mr-2" />
             <div className="flex flex-col">
-              <span className="font-bold text-base md:text-lg text-gray-800">Zero2Hero</span>
-              <span className="text-[8px] md:text-[10px] text-gray-500 -mt-1">ETHOnline24</span>
+              <span className="font-bold text-base md:text-lg text-gray-800">Pet Save App</span>
+              <span className="text-[8px] md:text-[10px] text-gray-500 -mt-1">SavePets24</span>
             </div>
           </Link>
         </div>
@@ -227,7 +232,7 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
           </div>
-        )}
+         )}
         <div className="flex items-center">
           {isMobile && (
             <Button variant="ghost" size="icon" className="mr-2">
