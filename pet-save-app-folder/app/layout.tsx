@@ -14,9 +14,9 @@ const inter = Inter({ subsets: ['latin'] })
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}) {
+}>) {
   const [sidebarOpen, setSidebarOpen] = useState(false) // Sidebar is closed by default
   const [totalEarnings, setTotalEarnings] = useState(0) // Total earnings is 0 by default
 
