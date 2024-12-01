@@ -29,7 +29,7 @@ export default function Sidebar({ open }: SidebarProps) {
                 variant={pathname === item.href ? "secondary" : "ghost"}
                 className={`w-full justify-start py-3 ${
                   pathname === item.href 
-                    ? "bg-green-100 text-green-800" 
+                    ? "bg-purple-100 text-purple-800" 
                     : "text-gray-600 hover:bg-gray-100"
                 }`} 
               >
@@ -45,7 +45,7 @@ export default function Sidebar({ open }: SidebarProps) {
               variant={pathname === "/settings" ? "secondary" : "outline"}
               className={`w-full py-3 ${
                 pathname === "/settings"
-                  ? "bg-green-100 text-green-800"
+                  ? "bg-purple-100 text-purple-800"
                   : "text-gray-600 border-gray-300 hover:bg-gray-100"
               }`} 
             >

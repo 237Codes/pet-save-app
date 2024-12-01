@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 // Import lucide icons  from the lucide-react package (lucide.dev website for more info)
-import { Menu, Coins, Leaf, Search, Bell, User, ChevronDown, LogIn, LogOut } from "lucide-react"
+import { Menu, Coins, Leaf, Search, Bell, User, ChevronDown, LogIn, LogOut, PawPrint } from "lucide-react"
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -216,7 +216,7 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
             <Menu className="h-6 w-6" />
           </Button>
           <Link href="/" className="flex items-center">
-            <Leaf className="h-6 w-6 md:h-8 md:w-8 text-green-500 mr-1 md:mr-2" />
+            <PawPrint className="h-6 w-6 md:h-8 md:w-8 text-purple-500 mr-1 md:mr-2" />
             <div className="flex flex-col">
               <span className="font-bold text-base md:text-lg text-gray-800">Pet Save App</span>
               <span className="text-[8px] md:text-[10px] text-gray-500 -mt-1">SavingPets</span>
@@ -229,7 +229,7 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
               <input
                 type="text"
                 placeholder="Search..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
@@ -271,13 +271,13 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
             </DropdownMenuContent>
           </DropdownMenu>
           <div className="mr-2 md:mr-4 flex items-center bg-gray-100 rounded-full px-2 md:px-3 py-1">
-            <Coins className="h-4 w-4 md:h-5 md:w-5 mr-1 text-green-500" />
+            <Coins className="h-4 w-4 md:h-5 md:w-5 mr-1 text-purple-500" />
             <span className="font-semibold text-sm md:text-base text-gray-800">
               {balance.toFixed(2)}
             </span>
           </div>
           {!loggedIn ? (
-            <Button onClick={login} className="bg-green-600 hover:bg-green-700 text-white text-sm md:text-base">
+            <Button onClick={login} className="bg-purple-600 hover:bg-purple-700 text-white text-sm md:text-base">
               Login
               <LogIn className="ml-1 md:ml-2 h-4 w-4 md:h-5 md:w-5" />
             </Button>
