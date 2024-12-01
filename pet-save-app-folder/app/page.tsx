@@ -45,7 +45,7 @@ export default function Home() {
         const rewards = await getAllRewards();
         const tasks = await getPetCollectionTasks(100);  // Fetch last 100 tasks
 
-        const wasteCollected = tasks.reduce((total, task) => {
+        const petsCollected = tasks.reduce((total, task) => {
           const match = task.weight.match(/(\d+(\.\d+)?)/);
           const amount = match ? parseFloat(match[0]) : 0;
           return total + amount;
@@ -53,22 +53,22 @@ export default function Home() {
 
         const reportsSubmitted = reports.length;
         const tokensEarned = rewards.reduce((total, reward) => total + (reward.points || 0), 0);
-        const co2Offset = wasteCollected * 0.5;  // Assuming 0.5 kg CO2 offset per kg of waste
+        const valueRedeemed = petsCollected * 0.5;  // Assuming 0.5 kg CO2 offset per kg of waste
 
         setImpactData({
-          wasteCollected: Math.round(wasteCollected * 10) / 10, // Round to 1 decimal place
+          petsCollected: Math.round(petsCollected * 10) / 10, // Round to 1 decimal place
           reportsSubmitted,
           tokensEarned,
-          co2Offset: Math.round(co2Offset * 10) / 10 // Round to 1 decimal place
+          valueRedeemed: Math.round(valueRedeemed * 10) / 10 // Round to 1 decimal place
         });
       } catch (error) {
         console.error("Error fetching impact data:", error);
         // Set default values in case of error
         setImpactData({
-          wasteCollected: 0,
+          petsCollected: 0,
           reportsSubmitted: 0,
           tokensEarned: 0,
-          co2Offset: 0
+          valueRedeemed: 0
         });
       }
     }
@@ -81,7 +81,7 @@ export default function Home() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className={`container mx-auto px-4 py-16 ${poppins.className}`}>
       <section className="text-center mb-20">
         <AnimatedGlobe />
         <h1 className="text-6xl font-bold mb-6 text-gray-800 tracking-tight">

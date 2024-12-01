@@ -3,14 +3,14 @@ import { useState, useCallback, useEffect } from 'react'
 import {  MapPin, Upload, CheckCircle, Loader } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { StandaloneSearchBox,  useJsApiLoader } from '@react-google-maps/api'
-// import { Libraries } from '@react-google-maps/api';
-// import { createUser, getUserByEmail, createReport, getRecentReports } from '@/utils/db/actions';
+import { StandaloneSearchBox, useJsApiLoader } from '@react-google-maps/api'
+import { Libraries } from '@react-google-maps/api';
+import { createUser, getUserByEmail, createReport, getRecentReports } from '@/utils/db/action';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast'
 
-const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+const geminiApiKey = process.env.GEMINI_API_KEY;
+const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 
 const libraries: Libraries = ['places'];
 
@@ -21,23 +21,23 @@ export default function ReportPage() {
   const [reports, setReports] = useState<Array<{
     id: number;
     location: string;
-    wasteType: string;
-    amount: string;
+    breed: string;
+    weight: string;
     createdAt: string;
   }>>([]);
 
   const [newReport, setNewReport] = useState({
     location: '',
-    type: '',
-    amount: '',
+    breed: '',
+    weight: '',
   })
 
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [verificationStatus, setVerificationStatus] = useState<'idle' | 'verifying' | 'success' | 'failure'>('idle')
   const [verificationResult, setVerificationResult] = useState<{
-    wasteType: string;
-    quantity: string;
+    breed: string;
+    weight: string;
     confidence: number;
   } | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -113,15 +113,15 @@ export default function ReportPage() {
         },
       ];
 
-      const prompt = `You are an expert in waste management and recycling. Analyze this image and provide:
-        1. The type of waste (e.g., plastic, paper, glass, metal, organic)
-        2. An estimate of the quantity or amount (in kg or liters)
+      const prompt = `You are an expert in pet analysis and classification. Analyze this image and provide:
+        1. The breed and type of the pet (e.g., german sheperd dog, persian cat, american shetland pony, etc)
+        2. An estimate of the weight of this animal (in kg or lb)
         3. Your confidence level in this assessment (as a percentage)
         
         Respond in JSON format like this:
         {
-          "wasteType": "type of waste",
-          "quantity": "estimated quantity with unit",
+          "breed": "type of pet",
+          "weight: "estimated weight with unit",
           "confidence": confidence level as a number between 0 and 1
         }`;
 
@@ -131,13 +131,13 @@ export default function ReportPage() {
       
       try {
         const parsedResult = JSON.parse(text);
-        if (parsedResult.wasteType && parsedResult.quantity && parsedResult.confidence) {
+        if (parsedResult.breed && parsedResult.weight && parsedResult.confidence) {
           setVerificationResult(parsedResult);
           setVerificationStatus('success');
           setNewReport({
             ...newReport,
-            type: parsedResult.wasteType,
-            amount: parsedResult.quantity
+            breed: parsedResult.breed,
+            weight: parsedResult.weight
           });
         } else {
           console.error('Invalid verification result:', parsedResult);
@@ -148,7 +148,7 @@ export default function ReportPage() {
         setVerificationStatus('failure');
       }
     } catch (error) {
-      console.error('Error verifying waste:', error);
+      console.error('Error verifying pet:', error);
       setVerificationStatus('failure');
     }
   }
@@ -156,7 +156,7 @@ export default function ReportPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (verificationStatus !== 'success' || !user) {
-      toast.error('Please verify the waste before submitting or log in.');
+      toast.error('Please verify the pet before submitting or log in.');
       return;
     }
     
@@ -165,8 +165,8 @@ export default function ReportPage() {
       const report = await createReport(
         user.id,
         newReport.location,
-        newReport.type,
-        newReport.amount,
+        newReport.breed,
+        newReport.weight,
         preview || undefined,
         verificationResult ? JSON.stringify(verificationResult) : undefined
       ) as any;
@@ -174,20 +174,20 @@ export default function ReportPage() {
       const formattedReport = {
         id: report.id,
         location: report.location,
-        wasteType: report.wasteType,
-        amount: report.amount,
+        breed: report.breed,
+        weight: report.weight,
         createdAt: report.createdAt.toISOString().split('T')[0]
       };
       
       setReports([formattedReport, ...reports]);
-      setNewReport({ location: '', type: '', amount: '' });
+      setNewReport({ location: '', breed: '', weight: '' });
       setFile(null);
       setPreview(null);
       setVerificationStatus('idle');
       setVerificationResult(null);
       
 
-      toast.success(`Report submitted successfully! You've earned points for reporting waste.`);
+      toast.success(`Report submitted successfully! You've earned points for reporting a lost pet.`);
     } catch (error) {
       console.error('Error submitting report:', error);
       toast.error('Failed to submit report. Please try again.');
@@ -221,23 +221,23 @@ export default function ReportPage() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-semibold mb-6 text-gray-800">Report waste</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-gray-800">Report Pet</h1>
       
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-lg mb-12">
         <div className="mb-8">
-          <label htmlFor="waste-image" className="block text-lg font-medium text-gray-700 mb-2">
-            Upload Waste Image
+          <label htmlFor="pet-image" className="block text-lg font-medium text-gray-700 mb-2">
+            Upload Pet Image
           </label>
-          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-green-500 transition-colors duration-300">
+          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-purple-500 transition-colors duration-300">
             <div className="space-y-1 text-center">
               <Upload className="mx-auto h-12 w-12 text-gray-400" />
               <div className="flex text-sm text-gray-600">
                 <label
-                  htmlFor="waste-image"
-                  className="relative cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-500"
+                  htmlFor="pet-image"
+                  className="relative cursor-pointer bg-white rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-purple-500"
                 >
                   <span>Upload a file</span>
-                  <input id="waste-image" name="waste-image" type="file" className="sr-only" onChange={handleFileChange} accept="image/*" />
+                  <input id="pet-image" name="pet-image" type="file" className="sr-only" onChange={handleFileChange} accept="image/*" />
                 </label>
                 <p className="pl-1">or drag and drop</p>
               </div>
@@ -248,7 +248,7 @@ export default function ReportPage() {
         
         {preview && (
           <div className="mt-4 mb-8">
-            <img src={preview} alt="Waste preview" className="max-w-full h-auto rounded-xl shadow-md" />
+            <img src={preview} alt="pet preview" className="max-w-full h-auto rounded-xl shadow-md" />
           </div>
         )}
         
@@ -263,18 +263,18 @@ export default function ReportPage() {
               <Loader className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
               Verifying...
             </>
-          ) : 'Verify Waste'}
+          ) : 'Verify Pet'}
         </Button>
 
         {verificationStatus === 'success' && verificationResult && (
-          <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-8 rounded-r-xl">
+          <div className="bg-purple-50 border-l-4 border-purple-400 p-4 mb-8 rounded-r-xl">
             <div className="flex items-center">
-              <CheckCircle className="h-6 w-6 text-green-400 mr-3" />
+              <CheckCircle className="h-6 w-6 text-purple-400 mr-3" />
               <div>
-                <h3 className="text-lg font-medium text-green-800">Verification Successful</h3>
-                <div className="mt-2 text-sm text-green-700">
-                  <p>Waste Type: {verificationResult.wasteType}</p>
-                  <p>Quantity: {verificationResult.quantity}</p>
+                <h3 className="text-lg font-medium text-purple-800">Verification Successful</h3>
+                <div className="mt-2 text-sm text-purple-700">
+                  <p>Breed: {verificationResult.breed}</p>
+                  <p>Weight: {verificationResult.weight}</p>
                   <p>Confidence: {(verificationResult.confidence * 100).toFixed(2)}%</p>
                 </div>
               </div>
@@ -290,6 +290,7 @@ export default function ReportPage() {
                 onLoad={onLoad}
                 onPlacesChanged={onPlacesChanged}
               >
+                <div>
                 <input
                   type="text"
                   id="location"
@@ -297,9 +298,10 @@ export default function ReportPage() {
                   value={newReport.location}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300"
-                  placeholder="Enter waste location"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+                  placeholder="Enter Pet location"
                 />
+                </div>
               </StandaloneSearchBox>
             ) : (
               <input
@@ -309,43 +311,43 @@ export default function ReportPage() {
                 value={newReport.location}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300"
-                placeholder="Enter waste location"
+                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+                placeholder="Enter Pet location"
               />
             )}
           </div>
           <div>
-            <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">Waste Type</label>
+            <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">Pet Breed</label>
             <input
               type="text"
               id="type"
               name="type"
-              value={newReport.type}
+              value={newReport.breed}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300 bg-gray-100"
-              placeholder="Verified waste type"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 bg-gray-100"
+              placeholder="Verified Pet Breed"
               readOnly
             />
           </div>
           <div>
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">Estimated Amount</label>
+            <label htmlFor="weight" className="block text-sm font-medium text-gray-700 mb-1">Estimated Weight</label>
             <input
               type="text"
-              id="amount"
-              name="amount"
-              value={newReport.amount}
+              id="weight"
+              name="weight"
+              value={newReport.weight}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300 bg-gray-100"
-              placeholder="Verified amount"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 bg-gray-100"
+              placeholder="Verified weight"
               readOnly
             />
           </div>
         </div>
         <Button 
           type="submit" 
-          className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg rounded-xl transition-colors duration-300 flex items-center justify-center"
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 text-lg rounded-xl transition-colors duration-300 flex items-center justify-center"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
@@ -365,7 +367,7 @@ export default function ReportPage() {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">weight</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
               </tr>
             </thead>
@@ -373,11 +375,11 @@ export default function ReportPage() {
               {reports.map((report) => (
                 <tr key={report.id} className="hover:bg-gray-50 transition-colors duration-200">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <MapPin className="inline-block w-4 h-4 mr-2 text-green-500" />
+                    <MapPin className="inline-block w-4 h-4 mr-2 text-purple-500" />
                     {report.location}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{report.wasteType}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{report.amount}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{report.breed}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{report.weight}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{report.createdAt}</td>
                 </tr>
               ))}
