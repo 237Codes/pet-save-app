@@ -1,9 +1,19 @@
+// @ts-nocheck
+'use client'
 import Image from "next/image";
-import { ArrowRight, Leaf, PawPrint, Users, Coins, MapPin, ChevronRight, BadgeDollarSign } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { ArrowRight, PawPrint, Users, Coins, MapPin, ChevronRight, BadgeDollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Poppins } from 'next/font/google'
+// import ContractInteraction from '@/components/ContractInteraction'
+import { getRecentReports, getAllRewards, getPetCollectionTasks } from '@/utils/db/action'
 import Link from 'next/link'
 
-
+const poppins = Poppins({ 
+  weight: ['300', '400', '600'],
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 
 function AnimatedGlobe() {
@@ -19,6 +29,57 @@ function AnimatedGlobe() {
 }
 
 export default function Home() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [impactData, setImpactData] = useState({
+    petsCollected: 0,
+    reportsSubmitted: 0,
+    tokensEarned: 0,
+    valueRedeemed: 0
+  });
+
+
+  useEffect(() => {
+    async function fetchImpactData() {
+      try {
+        const reports = await getRecentReports(100);  // Fetch last 100 reports
+        const rewards = await getAllRewards();
+        const tasks = await getPetCollectionTasks(100);  // Fetch last 100 tasks
+
+        const wasteCollected = tasks.reduce((total, task) => {
+          const match = task.weight.match(/(\d+(\.\d+)?)/);
+          const amount = match ? parseFloat(match[0]) : 0;
+          return total + amount;
+        }, 0);
+
+        const reportsSubmitted = reports.length;
+        const tokensEarned = rewards.reduce((total, reward) => total + (reward.points || 0), 0);
+        const co2Offset = wasteCollected * 0.5;  // Assuming 0.5 kg CO2 offset per kg of waste
+
+        setImpactData({
+          wasteCollected: Math.round(wasteCollected * 10) / 10, // Round to 1 decimal place
+          reportsSubmitted,
+          tokensEarned,
+          co2Offset: Math.round(co2Offset * 10) / 10 // Round to 1 decimal place
+        });
+      } catch (error) {
+        console.error("Error fetching impact data:", error);
+        // Set default values in case of error
+        setImpactData({
+          wasteCollected: 0,
+          reportsSubmitted: 0,
+          tokensEarned: 0,
+          co2Offset: 0
+        });
+      }
+    }
+
+    fetchImpactData();
+  }, []);
+
+  const login = () => {
+    setLoggedIn(true);
+  };
+
   return (
     <div className="container mx-auto px-4 py-16">
       <section className="text-center mb-20">
@@ -29,23 +90,31 @@ export default function Home() {
         <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-8">
           Join our community by helping each make it efficient and rewarding!
         </p>
+        {!loggedIn ? (
+          <Button onClick={login} className="bg-purple-600 hover:bg-purple-700 text-white text-lg py-6 px-10 rounded-full font-medium transition-all duration-300 ease-in-out transform hover:scale-105">
+              Report Pet Lost
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+        ) : (
+          <Link href="/report">
             <Button className="bg-purple-600 hover:bg-purple-700 text-white text-lg py-6 px-10 rounded-full font-medium transition-all duration-300 ease-in-out transform hover:scale-105">
               Report Pet Lost
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-      
+          </Link>
+        )}
       </section>
 
       <section className="grid md:grid-cols-3 gap-10 mb-20">
         <FeatureCard
-          icon={Leaf}
-          title="Eco-Friendly"
-          description="Contribute to a cleaner environment by reporting and collecting waste."
+          icon={PawPrint}
+          title="Pet-Friendly"
+          description="Contribute to a cleaner environment by reporting and collecting your stray Pets."
         />
         <FeatureCard
           icon={Coins}
           title="Earn Rewards"
-          description="Get tokens for your contributions to waste management efforts."
+          description="Get tokens for your contributions to pet finding efforts."
         />
         <FeatureCard
           icon={Users}

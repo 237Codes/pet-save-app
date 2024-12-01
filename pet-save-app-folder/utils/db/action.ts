@@ -223,8 +223,8 @@ export async function getPetCollectionTasks(limit: number = 20) {
       .select({
         id: Reports.id,
         location: Reports.location,
-        wasteType: Reports.breed,
-        amount: Reports.weight,
+        breed: Reports.breed,
+        weight: Reports.weight,
         status: Reports.status,
         date: Reports.createdAt,
         collectorId: Reports.collectorId,
@@ -243,7 +243,7 @@ export async function getPetCollectionTasks(limit: number = 20) {
   }
 }
 
-export async function saveReward(userId: number, amount: number) {
+export async function saveReward(userId: number, weight: number) {
   try {
     const [reward] = await db
       .insert(Rewards)
@@ -251,7 +251,7 @@ export async function saveReward(userId: number, amount: number) {
         userId,
         name: 'Pet Collection Reward',
         collectionInfo: 'Points earned from Pet collection',
-        points: amount,
+        points: weight,
         level: 1,
         isAvailable: true,
       })
@@ -259,7 +259,7 @@ export async function saveReward(userId: number, amount: number) {
       .execute();
     
     // Create a transaction for this reward
-    await createTransaction(userId, 'earned_collect', amount, 'Points earned for collecting a pet');
+    await createTransaction(userId, 'earned_collect', weight, 'Points earned for collecting a pet');
 
     return reward;
   } catch (error) {
@@ -336,7 +336,7 @@ export async function getRewardTransactions(userId: number) {
       .select({
         id: Transactions.id,
         type: Transactions.type,
-        amount: Transactions.amount,
+        weight: Transactions.weight,
         description: Transactions.description,
         date: Transactions.date,
       })
@@ -368,7 +368,7 @@ export async function getAvailableRewards(userId: number) {
     // Get user's total points
     const userTransactions = await getRewardTransactions(userId);
     const userPoints = userTransactions.reduce((total, transaction) => {
-      return transaction.type.startsWith('earned') ? total + transaction.amount : total - transaction.amount;
+      return transaction.type.startsWith('earned') ? total + transaction.weight : total - transaction.weight;
     }, 0);
 
     console.log('User total points:', userPoints);
@@ -408,11 +408,11 @@ export async function getAvailableRewards(userId: number) {
   }
 }
 
-export async function createTransaction(userId: number, type: 'earned_report' | 'earned_collect' | 'redeemed', amount: number, description: string) {
+export async function createTransaction(userId: number, type: 'earned_report' | 'earned_collect' | 'redeemed', weight: number, description: string) {
   try {
     const [transaction] = await db
       .insert(Transactions)
-      .values({ userId, type, amount, description })
+      .values({ userId, type, weight, description })
       .returning()
       .execute();
     return transaction;
@@ -474,7 +474,7 @@ export async function getUserBalance(userId: number): Promise<number> {
 
   if(!transactions) return 0;
   const balance = transactions.reduce((acc:number, transaction:any) => {
-    return transaction.type.startsWith('earned') ? acc + transaction.amount : acc - transaction.amount
+    return transaction.type.startsWith('earned') ? acc + transaction.weight : acc - transaction.weight
   }, 0);
   return Math.max(balance, 0); // Ensure balance is never negative
 }
