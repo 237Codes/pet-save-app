@@ -4,7 +4,7 @@ import { Trash2, MapPin, CheckCircle, Clock, ArrowRight, Camera, Upload, Loader,
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'react-hot-toast'
-import { getWasteCollectionTasks, updateTaskStatus, saveReward, saveCollectedWaste, getUserByEmail } from '@/utils/db/actions'
+import { getPetCollectionTasks, updateTaskStatus, saveReward, saveCollectedPet, getUserByEmail } from '@/utils/db/action'
 import { GoogleGenerativeAI } from "@google/generative-ai"
 
 // Make sure to set your Gemini API key in your environment variables
@@ -50,7 +50,7 @@ export default function CollectPage() {
         }
 
         // Fetch tasks
-        const fetchedTasks = await getWasteCollectionTasks()
+        const fetchedTasks = await getPetCollectionTasks()
         setTasks(fetchedTasks as CollectionTask[])
       } catch (error) {
         console.error('Error fetching user and tasks:', error)
@@ -166,7 +166,7 @@ export default function CollectPage() {
           await saveReward(user.id, earnedReward)
 
           // Save the collected waste
-          await saveCollectedWaste(selectedTask.id, user.id, parsedResult)
+          await saveCollectedPet(selectedTask.id, user.id, parsedResult)
 
           setReward(earnedReward)
           toast.success(`Verification successful! You earned ${earnedReward} tokens!`, {
@@ -203,7 +203,7 @@ export default function CollectPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-semibold mb-6 text-gray-800">Waste Collection Tasks</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-gray-800">Pet Collection Tasks</h1>
       
       <div className="mb-4 flex items-center">
         <Input
@@ -306,8 +306,8 @@ export default function CollectPage() {
       {selectedTask && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-semibold mb-4">Verify Collection</h3>
-            <p className="mb-4 text-sm text-gray-600">Upload a photo of the collected waste to verify and earn your reward.</p>
+            <h3 className="text-xl font-semibold mb-4">Verify Pet</h3>
+            <p className="mb-4 text-sm text-gray-600">Upload a photo of the collected pet to verify and earn your reward.</p>
             <div className="mb-4">
               <label htmlFor="verification-image" className="block text-sm font-medium text-gray-700 mb-2">
                 Upload Image
@@ -341,7 +341,7 @@ export default function CollectPage() {
                   <Loader className="animate-spin -ml-1 mr-3 h-5 w-5" />
                   Verifying...
                 </>
-              ) : 'Verify Collection'}
+              ) : 'Verify Pet'}
             </Button>
             {verificationStatus === 'success' && verificationResult && (
               <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
