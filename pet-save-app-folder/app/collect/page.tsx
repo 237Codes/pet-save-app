@@ -72,7 +72,7 @@ export default function CollectPage() {
     weightMatch: boolean;
     confidence: number;
   } | null>(null)
-  const [_reward, setReward] = useState<number | null>(null)
+  const [, setReward] = useState<number | null>(null)
 
   const handleStatusChange = async (taskId: number, newStatus: CollectionTask['status']) => {
     if (!user) {

@@ -49,7 +49,7 @@ interface HeaderProps {
 
 export default function Header({ onMenuClick }: HeaderProps) {
   const [isWalletInitialized, setIsWalletInitialized] = useState(false);
-  const [_provider, setProvider] = useState<IProvider | null>(null);
+  const [, setProvider] = useState<IProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
   interface UserInfo {
@@ -58,7 +58,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
   }
 
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const pathname = usePathname()
+  // const pathname = usePathname()
   interface CustomNotification {
     id: number;
     createdAt: Date;

@@ -30,7 +30,7 @@ function AnimatedGlobe() {
 
 export default function Home() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [_impactData, setImpactData] = useState({
+  const [, setImpactData] = useState({
     petsCollected: 0,
     reportsSubmitted: 0,
     tokensEarned: 0,
