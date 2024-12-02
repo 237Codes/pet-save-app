@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Trash2, MapPin, CheckCircle, Clock, ArrowRight, Camera, Upload, Loader, Calendar, Weight, Search } from 'lucide-react'
+import { PawPrint, MapPin, CheckCircle, Clock, ArrowRight, Camera, Upload, Loader, Calendar, Weight, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'react-hot-toast'
@@ -8,7 +8,7 @@ import { getPetCollectionTasks, updateTaskStatus, saveReward, saveCollectedPet, 
 import { GoogleGenerativeAI } from "@google/generative-ai"
 
 // Make sure to set your Gemini API key in your environment variables
-const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY
+const geminiApiKey = 'AIzaSyDJYd2EEOkWFKTpv5In4eGiw2gVHl2TPvA';
 
 type CollectionTask = {
   id: number
@@ -133,12 +133,12 @@ export default function CollectPage() {
         },
       ]
 
-      const prompt = `You are an expert in pet management and recycling. Analyze this image and provide:
+      const prompt = `You are an expert in pet analysis and classification. Analyze this image and provide:
         1. Confirm if the pet type matches: ${selectedTask.breed}
-        2. Estimate if the weight matches: ${selectedTask.weight}
+        2. Estimate if the weight is plus or minus 10 units near ${selectedTask.weight}
         3. Your confidence level in this assessment (as a percentage)
         
-        Respond in JSON format like this:
+        Respond in JSON format without any markdown formatting or code blocks like this:
         {
           "breedMatch": true/false,
           "weightMatch": true/false,
@@ -150,7 +150,8 @@ export default function CollectPage() {
       const text = response.text()
       
       try {
-        const parsedResult = JSON.parse(text)
+        const cleanedText = text.replace(/```json\n?|\n?```/g, '').trim();   // clean up the response text
+        const parsedResult = JSON.parse(cleanedText); // parse the response text
         setVerificationResult({
           breedMatch: parsedResult.breedMatch,
           weightMatch: parsedResult.weightMatch,
@@ -236,7 +237,7 @@ export default function CollectPage() {
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-sm text-gray-600 mb-3">
                   <div className="flex items-center relative">
-                    <Trash2 className="w-4 h-4 mr-2 text-gray-500" />
+                    <PawPrint className="w-4 h-4 mr-2 text-gray-500" />
                     <span 
                       onMouseEnter={() => setHoveredbreed(task.breed)}
                       onMouseLeave={() => setHoveredbreed(null)}
@@ -374,7 +375,7 @@ export default function CollectPage() {
 function StatusBadge({ status }: { status: CollectionTask['status'] }) {
   const statusConfig = {
     pending: { color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-    in_progress: { color: 'bg-blue-100 text-blue-800', icon: Trash2 },
+    in_progress: { color: 'bg-blue-100 text-blue-800', icon: PawPrint },
     completed: { color: 'bg-purple-100 text-purple-800', icon: CheckCircle },
     verified: { color: 'bg-purple-100 text-purple-800', icon: CheckCircle },
   }

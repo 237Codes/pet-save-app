@@ -122,13 +122,13 @@ export default function ReportPage() {
 
       const prompt = `You are an expert in pet analysis and classification. Analyze this image and provide:
         1. The breed and type of the pet (e.g., german sheperd dog, persian cat, american shetland pony, etc)
-        2. An estimate of the weight of this animal in lb
+        2. An estimate of the weight range of this animal in lb
         3. Your confidence level in this assessment (as a percentage)
         
         Respond in JSON format without any markdown formatting or code blocks like this:
         {
           "breed": "type of pet",
-          "weight: "estimated weight with unit in lb",
+          "weight: "estimated weight range with unit in lb",
           "confidence": confidence level as a number between 0 and 1
         }`;
 
