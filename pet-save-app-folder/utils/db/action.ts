@@ -115,9 +115,9 @@ export async function updateRewardPoints(userId: number, pointsToAdd: number) {
   }
 }
 
-export async function createCollectedWaste(reportId: number, collectorId: number, notes?: string) {
+export async function createcollectedPets(reportId: number, collectorId: number, notes?: string) {
   try {
-    const [collectedWaste] = await db
+    const [collectedPets] = await db
       .insert(CollectedPets)
       .values({
         reportId,
@@ -126,7 +126,7 @@ export async function createCollectedWaste(reportId: number, collectorId: number
       })
       .returning()
       .execute();
-    return collectedWaste;
+    return collectedPets;
   } catch (error) {
     console.error("Error creating collected waste:", error);
     return null;

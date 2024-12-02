@@ -58,7 +58,7 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
   const isMobile = useMediaQuery("(max-width: 768px)")
   const [balance, setBalance] = useState(0)
 
-  console.log('user info', userInfo); // Log the user info to the console
+  // console.log('user info', userInfo); // Log the user info to the console
   
   // Use Effect that initializes the web3 auth 
   useEffect(() => {

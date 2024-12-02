@@ -17,6 +17,7 @@ const libraries: Libraries = ['places'];
 export default function ReportPage() {
   const [user, setUser] = useState<{ id: number; email: string; name: string } | null>(null);
   const router = useRouter();
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   const [reports, setReports] = useState<Array<{
     id: number;
@@ -198,13 +199,18 @@ export default function ReportPage() {
 
   useEffect(() => {
     const checkUser = async () => {
-      const email = localStorage.getItem('userEmail');
-      if (email) {
-        let user = await getUserByEmail(email);
-        if (!user) {
-          user = await createUser(email, 'Anonymous User');
+      try {
+        const email = localStorage.getItem('userEmail');
+        if (!email) {
+          router.push('/login');
+          return;
         }
-        setUser(user);
+
+        let currentUser = await getUserByEmail(email);
+        if (!currentUser) {
+          currentUser = await createUser(email, 'Anonymous User');
+        }
+        setUser(currentUser);
         
         const recentReports = await getRecentReports();
         const formattedReports = recentReports.map(report => ({
@@ -212,12 +218,29 @@ export default function ReportPage() {
           createdAt: report.createdAt.toISOString().split('T')[0]
         }));
         setReports(formattedReports);
-      } else {
-        router.push('/login'); 
+      } catch (error) {
+        console.error('Error checking user:', error);
+        toast.error('Authentication error. Please try logging in again.');
+        router.push('/login');
+      } finally {
+        setIsPageLoading(false);
       }
     };
+
     checkUser();
   }, [router]);
+
+   if (isPageLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader className="h-8 w-8 animate-spin text-purple-600" />
+      </div>
+    );
+  }
+
+    if (!user) {
+    return null;
+  }
 
   return (
     <div className="p-8 max-w-4xl mx-auto">

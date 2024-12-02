@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getOrCreateReward, getUnreadNotifications, markNotificationAsRead } from '@/utils/db/actions';
+import { getOrCreateReward, getUnreadNotifications, markNotificationAsRead } from '@/utils/db/action';
 
 export function UserDashboard({ userId }: { userId: number }) {
   const [reward, setReward] = useState<{ points: number; level: number } | null>(null);
