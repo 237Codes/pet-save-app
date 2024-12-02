@@ -331,6 +331,7 @@ export default function ReportPage() {
           <div>
             <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Location</label>
             {isLoaded ? (
+              // @ts-ignore - Google Maps types are not perfect
               <StandaloneSearchBox
                 onLoad={onLoad}
                 onPlacesChanged={onPlacesChanged}
