@@ -2,7 +2,7 @@
 'use client'
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { usePathname } from 'next/navigation'
+// import { usePathname } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 // Import lucide icons  from the lucide-react package (lucide.dev website for more info)
 import { Menu, Coins, Search, Bell, User, ChevronDown, LogIn, PawPrint } from "lucide-react"
