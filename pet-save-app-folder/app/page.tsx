@@ -1,8 +1,8 @@
-// @ts-nocheck
+// removed ts nocheck 
 'use client'
-import Image from "next/image";
+// import Image from "next/image";
 import { useState, useEffect } from 'react'
-import { ArrowRight, PawPrint, Users, Coins, MapPin, ChevronRight, BadgeDollarSign } from 'lucide-react'
+import { ArrowRight, PawPrint, Users, Coins, MapPin, BadgeDollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Poppins } from 'next/font/google'
 // import ContractInteraction from '@/components/ContractInteraction'
@@ -30,7 +30,7 @@ function AnimatedGlobe() {
 
 export default function Home() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [impactData, setImpactData] = useState({
+  const [_impactData, setImpactData] = useState({
     petsCollected: 0,
     reportsSubmitted: 0,
     tokensEarned: 0,

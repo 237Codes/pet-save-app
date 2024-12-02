@@ -1,11 +1,11 @@
-// @ts-nocheck
+// take away ts-nocheck
 'use client'
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 // Import lucide icons  from the lucide-react package (lucide.dev website for more info)
-import { Menu, Coins, Leaf, Search, Bell, User, ChevronDown, LogIn, LogOut, PawPrint } from "lucide-react"
+import { Menu, Coins, Search, Bell, User, ChevronDown, LogIn, PawPrint } from "lucide-react"
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -47,14 +47,28 @@ interface HeaderProps {
   totalEarnings: number;
 }
 
-export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
+export default function Header({ onMenuClick }: HeaderProps) {
   const [isWalletInitialized, setIsWalletInitialized] = useState(false);
-  const [provider, setProvider] = useState<IProvider | null>(null);
+  const [_provider, setProvider] = useState<IProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [userInfo, setUserInfo] = useState<any>(null);
+  interface UserInfo {
+    email: string;
+    name?: string;
+  }
+
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const pathname = usePathname()
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  interface CustomNotification {
+    id: number;
+    createdAt: Date;
+    userId: number;
+    message: string;
+    type: string;
+    isRead: boolean;
+  }
+  
+  const [notifications, setNotifications] = useState<CustomNotification[]>([]);
   const isMobile = useMediaQuery("(max-width: 768px)")
   const [balance, setBalance] = useState(0)
 
@@ -70,7 +84,9 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
         if (web3auth.connected) {
           setLoggedIn(true);
           const user = await web3auth.getUserInfo();
-          setUserInfo(user);
+          if (user.email) {
+            setUserInfo({ email: user.email, name: user.name });
+          }
           if (user.email) {
             localStorage.setItem('userEmail', user.email);
             try {
@@ -149,7 +165,7 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
       setProvider(web3authProvider);
       setLoggedIn(true);
       const user = await web3auth.getUserInfo();
-      setUserInfo(user);
+      setUserInfo({ email: user.email || '', name: user.name });
       if (user.email) {
         localStorage.setItem('userEmail', user.email);
         try {
@@ -184,7 +200,7 @@ export default function Header({ onMenuClick, totalEarnings }: HeaderProps) {
   const getUserInfo = async () => {
     if (web3auth.connected) {
       const user = await web3auth.getUserInfo();
-      setUserInfo(user);
+      setUserInfo({ email: user.email || '', name: user.name });
       if (user.email) {
         localStorage.setItem('userEmail', user.email);
         try {

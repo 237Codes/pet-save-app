@@ -1,5 +1,6 @@
 'use client'
 import { useState, useCallback, useEffect } from 'react'
+// import Image from 'next/image';
 import {  MapPin, Upload, CheckCircle, Loader } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -153,7 +154,7 @@ export default function ReportPage() {
           setVerificationStatus('failure');
         }
       } catch (error) {
-        console.error('Failed to parse JSON response:', text);
+        console.error('Failed to parse JSON response:', error);
         setVerificationStatus('failure');
       }
     } catch (error) {
@@ -184,11 +185,11 @@ export default function ReportPage() {
         newReport.weight,
         preview || undefined,
         verificationResult ? JSON.stringify(verificationResult) : undefined
-      ) as any;
-      
-        if (!report?.id) {
-            throw new Error('Failed to create report - no ID returned');
-        }
+      );
+
+      if (!report || typeof report !== 'object' || !('id' in report)) {
+        throw new Error('Failed to create report - no ID returned');
+      }
       const formattedReport = {
         id: report.id,
         location: report.location,
@@ -234,7 +235,7 @@ export default function ReportPage() {
         setUser(currentUser);
         //Up untill here
         const recentReports = await getRecentReports();
-        const formattedReports = recentReports.map((report: any) => ({
+        const formattedReports = recentReports.map((report) => ({
           ...report,
           createdAt: report.createdAt.toISOString().split('T')[0]
         }));

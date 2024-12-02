@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { PawPrint, MapPin, CheckCircle, Clock, ArrowRight, Camera, Upload, Loader, Calendar, Weight, Search } from 'lucide-react'
+// import Image from 'next/image';
+import { PawPrint, MapPin, CheckCircle, Clock, Upload, Loader, Calendar, Weight, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'react-hot-toast'
@@ -71,7 +72,7 @@ export default function CollectPage() {
     weightMatch: boolean;
     confidence: number;
   } | null>(null)
-  const [reward, setReward] = useState<number | null>(null)
+  const [_reward, setReward] = useState<number | null>(null)
 
   const handleStatusChange = async (taskId: number, newStatus: CollectionTask['status']) => {
     if (!user) {
