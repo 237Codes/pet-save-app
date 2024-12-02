@@ -51,7 +51,7 @@ export async function createReport(
     await updateRewardPoints(userId, pointsEarned);
 
     // Create a transaction for the earned points
-    await createTransaction(userId, 'earned_report', pointsEarned, 'Points earned for reporting waste');
+    await createTransaction(userId, 'earned_report', pointsEarned, 'Points earned for reporting a pet');
 
     // Create a notification for the user
     await createNotification(

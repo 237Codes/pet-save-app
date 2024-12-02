@@ -9,7 +9,7 @@ import { createUser, getUserByEmail, createReport, getRecentReports } from '@/ut
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast'
 
-const geminiApiKey = process.env.GEMINI_API_KEY;
+const geminiApiKey = process.env.GEMINI_API_KEY as any;
 const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 
 const libraries: Libraries = ['places'];
@@ -21,7 +21,7 @@ export default function ReportPage() {
 
   const [reports, setReports] = useState<Array<{
     id: number;
-    location: string;
+    location: string; // ''
     breed: string;
     weight: string;
     createdAt: string;
@@ -100,8 +100,8 @@ export default function ReportPage() {
     setVerificationStatus('verifying')
     
     try {
-      const genAI = new GoogleGenerativeAI(geminiApiKey!);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const genAI = new GoogleGenerativeAI(geminiApiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); //specify model to use for pet verification
 
       const base64Data = await readFileAsBase64(file);
 
@@ -116,13 +116,13 @@ export default function ReportPage() {
 
       const prompt = `You are an expert in pet analysis and classification. Analyze this image and provide:
         1. The breed and type of the pet (e.g., german sheperd dog, persian cat, american shetland pony, etc)
-        2. An estimate of the weight of this animal (in kg or lb)
+        2. An estimate of the weight of this animal in lb
         3. Your confidence level in this assessment (as a percentage)
         
-        Respond in JSON format like this:
+        Respond in JSON format without any markdown formatting or code blocks like this:
         {
           "breed": "type of pet",
-          "weight: "estimated weight with unit",
+          "weight: "estimated weight with unit as a single number",
           "confidence": confidence level as a number between 0 and 1
         }`;
 
@@ -131,7 +131,9 @@ export default function ReportPage() {
       const text = response.text();
       
       try {
-        const parsedResult = JSON.parse(text);
+        const cleanedText = text.replace(/```json\n?|\n?```/g, '').trim();   // clean up the response text
+        const parsedResult = JSON.parse(cleanedText); // parse the response text
+        // const parsedResult = JSON.parse(text);
         if (parsedResult.breed && parsedResult.weight && parsedResult.confidence) {
           setVerificationResult(parsedResult);
           setVerificationStatus('success');
