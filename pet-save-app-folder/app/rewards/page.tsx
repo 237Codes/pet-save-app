@@ -9,7 +9,7 @@ import { toast } from 'react-hot-toast'
 type Transaction = {
   id: number
   type: 'earned_report' | 'earned_collect' | 'redeemed'
-  amount: number
+  weight: number
   description: string
   date: string
 }
@@ -39,29 +39,43 @@ export default function RewardsPage() {
           if (fetchedUser) {
             setUser(fetchedUser)
             const fetchedTransactions = await getRewardTransactions(fetchedUser.id)
-            setTransactions(fetchedTransactions as Transaction[])
-            const fetchedRewards = await getAvailableRewards(fetchedUser.id)
-            setRewards(fetchedRewards.filter(r => r.cost > 0)) // Filter out rewards with 0 points
-            const calculatedBalance = fetchedTransactions.reduce((acc, transaction) => {
-              return transaction.type.startsWith('earned') ? acc + transaction.amount : acc - transaction.amount
-            }, 0)
-            setBalance(Math.max(calculatedBalance, 0)) // Ensure balance is never negative
-          } else {
-            toast.error('User not found. Please log in again.')
-          }
-        } else {
-          toast.error('User not logged in. Please log in.')
-        }
-      } catch (error) {
-        console.error('Error fetching user data and rewards:', error)
-        toast.error('Failed to load rewards data. Please try again.')
-      } finally {
-        setLoading(false)
-      }
-    }
 
-    fetchUserDataAndRewards()
-  }, [])
+            // Ensure transactions are properly typed and weights are numbers
+            const validTransactions = (fetchedTransactions as Transaction[]).map(t => ({
+              ...t,
+              weight: Number(t.weight) // Convert weight to number
+            }))
+            setTransactions(validTransactions)
+
+          // Calculate balance with number type checking
+          const calculatedBalance = validTransactions.reduce((acc, transaction) => {
+            const weight = Number(transaction.weight) || 0
+            return transaction.type.startsWith('earned') ? 
+              acc + weight : 
+              acc - weight
+          }, 0)
+          
+          setBalance(Math.max(calculatedBalance, 0)) // Ensure balance is never negative
+          
+          const fetchedRewards = await getAvailableRewards(fetchedUser.id)
+          setRewards(fetchedRewards.filter(r => Number(r.cost) > 0))
+        } else {
+          toast.error('User not found. Please log in again.')
+        }
+      } else {
+        toast.error('User not logged in. Please log in.')
+      }
+    } catch (error) {
+      console.error('Error fetching user data and rewards:', error)
+      toast.error('Failed to load rewards data. Please try again.')
+      setBalance(0) // Set default balance on error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  fetchUserDataAndRewards()
+}, [])
 
   const handleRedeemReward = async (rewardId: number) => {
     if (!user) {
@@ -123,23 +137,39 @@ export default function RewardsPage() {
     }
   }
 
-  const refreshUserData = async () => {
-    if (user) {
+const refreshUserData = async () => {
+  if (user) {
+    try {
       const fetchedUser = await getUserByEmail(user.email);
       if (fetchedUser) {
         const fetchedTransactions = await getRewardTransactions(fetchedUser.id);
-        setTransactions(fetchedTransactions as Transaction[]);
-        const fetchedRewards = await getAvailableRewards(fetchedUser.id);
-        setRewards(fetchedRewards.filter(r => r.cost > 0)); // Filter out rewards with 0 points
         
-        // Recalculate balance
-        const calculatedBalance = fetchedTransactions.reduce((acc, transaction) => {
-          return transaction.type.startsWith('earned') ? acc + transaction.amount : acc - transaction.amount
+        // Ensure transactions are properly typed and weights are numbers
+        const validTransactions = (fetchedTransactions as Transaction[]).map(t => ({
+          ...t,
+          weight: Number(t.weight)
+        }))
+        setTransactions(validTransactions);
+        
+        // Calculate balance with number type checking
+        const calculatedBalance = validTransactions.reduce((acc, transaction) => {
+          const weight = Number(transaction.weight) || 0
+          return transaction.type.startsWith('earned') ? 
+            acc + weight : 
+            acc - weight
         }, 0)
-        setBalance(Math.max(calculatedBalance, 0)) // Ensure balance is never negative
+        
+        setBalance(Math.max(calculatedBalance, 0))
+        
+        const fetchedRewards = await getAvailableRewards(fetchedUser.id);
+        setRewards(fetchedRewards.filter(r => Number(r.cost) > 0));
       }
+    } catch (error) {
+      console.error('Error refreshing user data:', error);
+      toast.error('Failed to refresh data');
     }
   }
+}
 
   if (loading) {
     return <div className="flex justify-center items-center h-64">
@@ -151,13 +181,13 @@ export default function RewardsPage() {
     <div className="p-8 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold mb-6 text-gray-800">Rewards</h1>
       
-      <div className="bg-white p-6 rounded-xl shadow-lg flex flex-col justify-between h-full border-l-4 border-green-500 mb-8">
+      <div className="bg-white p-6 rounded-xl shadow-lg flex flex-col justify-between h-full border-l-4 border-purple-500 mb-8">
         <h2 className="text-xl font-semibold mb-4 text-gray-800">Reward Balance</h2>
         <div className="flex items-center justify-between mt-auto">
           <div className="flex items-center">
-            <Coins className="w-10 h-10 mr-3 text-green-500" />
+            <Coins className="w-10 h-10 mr-3 text-purple-500" />
             <div>
-              <span className="text-4xl font-bold text-green-500">{balance}</span>
+              <span className="text-4xl font-bold text-purple-500">{balance}</span>
               <p className="text-sm text-gray-500">Available Points</p>
             </div>
           </div>
@@ -173,9 +203,9 @@ export default function RewardsPage() {
                 <div key={transaction.id} className="flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0">
                   <div className="flex items-center">
                     {transaction.type === 'earned_report' ? (
-                      <ArrowUpRight className="w-5 h-5 text-green-500 mr-3" />
+                      <ArrowUpRight className="w-5 h-5 text-purple-500 mr-3" />
                     ) : transaction.type === 'earned_collect' ? (
-                      <ArrowUpRight className="w-5 h-5 text-blue-500 mr-3" />
+                      <ArrowUpRight className="w-5 h-5 text-orange-500 mr-3" />
                     ) : (
                       <ArrowDownRight className="w-5 h-5 text-red-500 mr-3" />
                     )}
@@ -184,8 +214,8 @@ export default function RewardsPage() {
                       <p className="text-sm text-gray-500">{transaction.date}</p>
                     </div>
                   </div>
-                  <span className={`font-semibold ${transaction.type.startsWith('earned') ? 'text-green-500' : 'text-red-500'}`}>
-                    {transaction.type.startsWith('earned') ? '+' : '-'}{transaction.amount}
+                  <span className={`font-semibold ${transaction.type.startsWith('earned') ? 'text-purple-500' : 'text-red-500'}`}>
+                    {transaction.type.startsWith('earned') ? '+' : '-'}{transaction.weight}
                   </span>
                 </div>
               ))
@@ -203,7 +233,7 @@ export default function RewardsPage() {
                 <div key={reward.id} className="bg-white p-4 rounded-xl shadow-md">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="text-lg font-semibold text-gray-800">{reward.name}</h3>
-                    <span className="text-green-500 font-semibold">{reward.cost} points</span>
+                    <span className="text-purple-500 font-semibold">{reward.cost} points</span>
                   </div>
                   <p className="text-gray-600 mb-2">{reward.description}</p>
                   <p className="text-sm text-gray-500 mb-4">{reward.collectionInfo}</p>
@@ -211,7 +241,7 @@ export default function RewardsPage() {
                     <div className="space-y-2">
                       <Button 
                         onClick={handleRedeemAllPoints}
-                        className="w-full bg-green-500 hover:bg-green-600 text-white"
+                        className="w-full bg-purple-500 hover:bg-purple-600 text-white"
                         disabled={balance === 0}
                       >
                         <Gift className="w-4 h-4 mr-2" />
@@ -221,7 +251,7 @@ export default function RewardsPage() {
                   ) : (
                     <Button 
                       onClick={() => handleRedeemReward(reward.id)}
-                      className="w-full bg-green-500 hover:bg-green-600 text-white"
+                      className="w-full bg-purple-500 hover:bg-purple-600 text-white"
                       disabled={balance < reward.cost}
                     >
                       <Gift className="w-4 h-4 mr-2" />
