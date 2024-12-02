@@ -367,7 +367,7 @@ export async function getAvailableRewards(userId: number) {
     
     // Get user's total points
     const userTransactions = await getRewardTransactions(userId);
-    const userPoints = userTransactions.reduce((total, transaction) => {
+    const userPoints = userTransactions.reduce((total: any, transaction) => {
       return transaction.type.startsWith('earned') ? total + transaction.weight : total - transaction.weight;
     }, 0);
 
@@ -395,7 +395,7 @@ export async function getAvailableRewards(userId: number) {
         name: "Your Points",
         cost: userPoints,
         description: "Redeem your earned points",
-        collectionInfo: "Points earned from reporting and collecting waste"
+        collectionInfo: "Points earned from reporting and collecting pets"
       },
       ...dbRewards
     ];
