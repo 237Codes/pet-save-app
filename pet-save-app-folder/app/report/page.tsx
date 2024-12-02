@@ -14,8 +14,14 @@ const googleMapsApiKey = 'AIzaSyATUmvONcmrKNE1EGpUk3G9huoL3SgzphY';
 
 const libraries: Libraries = ['places'];
 
+interface User {
+  id: number;
+  email: string;
+  name: string;
+};
+
 export default function ReportPage() {
-  const [user, setUser] = useState("") as any;    //<{ id: number; email: string; name: string } | null>(null);
+  const [user, setUser] = useState<User | null>(null);    //<{ id: number; email: string; name: string } | null>(null);
   const router = useRouter();
   const [isPageLoading, setIsPageLoading] = useState(true);
 
@@ -158,8 +164,14 @@ export default function ReportPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!user?.id) {
+    toast.error('User not authenticated. Please log in.');
+    return;
+    }
+
     if (verificationStatus !== 'success' || !user) {
-      toast.error('Please verify the pet before submitting or log in.');
+      toast.error('Please verify the pet before submitting');
       return;
     }
     
@@ -174,6 +186,9 @@ export default function ReportPage() {
         verificationResult ? JSON.stringify(verificationResult) : undefined
       ) as any;
       
+        if (!report?.id) {
+            throw new Error('Failed to create report - no ID returned');
+        }
       const formattedReport = {
         id: report.id,
         location: report.location,
