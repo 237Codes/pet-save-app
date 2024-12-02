@@ -125,7 +125,7 @@ export default function LeaderboardPage() {
                           {index < 3 ? (
                             <Crown 
                               className={`h-6 w-6 ${
-                                index === 0 ? 'text-yellow-400' : 
+                                index === 0 ? 'text-orange-400' : 
                                 index === 1 ? 'text-gray-400' : 
                                 'text-orange-400'
                               }`} 
