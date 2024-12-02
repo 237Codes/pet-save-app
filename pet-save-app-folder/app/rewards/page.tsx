@@ -28,6 +28,7 @@ export default function RewardsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [rewards, setRewards] = useState<Reward[]>([])
   const [loading, setLoading] = useState(true)
+  const [isRedeeming, setIsRedeeming] = useState(false);
 
   useEffect(() => {
     const fetchUserDataAndRewards = async () => {
@@ -77,65 +78,82 @@ export default function RewardsPage() {
   fetchUserDataAndRewards()
 }, [])
 
+  // Update handleRedeemReward function
   const handleRedeemReward = async (rewardId: number) => {
     if (!user) {
-      toast.error('Please log in to redeem rewards.')
-      return
+      toast.error('Please log in to redeem rewards.');
+      return;
     }
 
-    const reward = rewards.find(r => r.id === rewardId)
-    if (reward && balance >= reward.cost && reward.cost > 0) {
-      try {
-        if (balance < reward.cost) {
-          toast.error('Insufficient balance to redeem this reward')
-          return
-        }
-
-        // Update database
-        await redeemReward(user.id, rewardId);
-        
-        // Create a new transaction record
-        await createTransaction(user.id, 'redeemed', reward.cost, `Redeemed ${reward.name}`);
-
-        // Refresh user data and rewards after redemption
-        await refreshUserData();
-
-        toast.success(`You have successfully redeemed: ${reward.name}`)
-      } catch (error) {
-        console.error('Error redeeming reward:', error)
-        toast.error('Failed to redeem reward. Please try again.')
-      }
-    } else {
-      toast.error('Insufficient balance or invalid reward cost')
+    const reward = rewards.find(r => r.id === rewardId);
+    if (!reward) {
+      toast.error('Invalid reward selected');
+      return;
     }
-  }
 
+    if (balance < reward.cost) {
+      toast.error('Insufficient balance to redeem this reward');
+      return;
+    }
+
+    setIsRedeeming(true);
+    try {
+      // Update database
+      await redeemReward(user.id, rewardId);
+      
+      // Create transaction record
+      await createTransaction(user.id, 'redeemed', reward.cost, `Redeemed ${reward.name}`);
+
+      // Update local state immediately
+      setBalance(prev => Math.max(prev - reward.cost, 0));
+      
+      // Refresh all data
+      await refreshUserData();
+
+      toast.success(`Successfully redeemed: ${reward.name}`);
+    } catch (error) {
+      console.error('Error redeeming reward:', error);
+      toast.error('Failed to redeem reward. Please try again.');
+    } finally {
+      setIsRedeeming(false);
+    }
+  };
+
+// Update handleRedeemAllPoints function
   const handleRedeemAllPoints = async () => {
     if (!user) {
       toast.error('Please log in to redeem points.');
       return;
     }
 
-    if (balance > 0) {
-      try {
-        // Update database
-        await redeemReward(user.id, 0);
-        
-        // Create a new transaction record
-        await createTransaction(user.id, 'redeemed', balance, 'Redeemed all points');
-
-        // Refresh user data and rewards after redemption
-        await refreshUserData();
-
-        toast.success(`You have successfully redeemed all your points!`);
-      } catch (error) {
-        console.error('Error redeeming all points:', error);
-        toast.error('Failed to redeem all points. Please try again.');
-      }
-    } else {
-      toast.error('No points available to redeem')
+    if (balance <= 0) {
+      toast.error('No points available to redeem');
+      return;
     }
-  }
+
+    setIsRedeeming(true);
+    try {
+      // Update database
+      await redeemReward(user.id, 0);
+      
+      // Create transaction record
+      await createTransaction(user.id, 'redeemed', balance, 'Redeemed all points');
+
+      // Update local state immediately
+      setBalance(0);
+      
+      // Refresh all data
+      await refreshUserData();
+
+      toast.success('Successfully redeemed all points!');
+    } catch (error) {
+      console.error('Error redeeming points:', error);
+      toast.error('Failed to redeem points. Please try again.');
+    } finally {
+      setIsRedeeming(false);
+    }
+  };
+
 
 const refreshUserData = async () => {
   if (user) {
@@ -238,24 +256,30 @@ const refreshUserData = async () => {
                   <p className="text-gray-600 mb-2">{reward.description}</p>
                   <p className="text-sm text-gray-500 mb-4">{reward.collectionInfo}</p>
                   {reward.id === 0 ? (
-                    <div className="space-y-2">
-                      <Button 
-                        onClick={handleRedeemAllPoints}
-                        className="w-full bg-purple-500 hover:bg-purple-600 text-white"
-                        disabled={balance === 0}
-                      >
+                    <Button 
+                      onClick={handleRedeemAllPoints}
+                      className="w-full bg-purple-500 hover:bg-purple-600 text-white"
+                      disabled={balance === 0 || isRedeeming}
+                    >
+                      {isRedeeming ? (
+                        <Loader className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
                         <Gift className="w-4 h-4 mr-2" />
-                        Redeem All Points
-                      </Button>
-                    </div>
+                      )}
+                      {isRedeeming ? 'Redeeming...' : 'Redeem All Points'}
+                    </Button>
                   ) : (
                     <Button 
                       onClick={() => handleRedeemReward(reward.id)}
                       className="w-full bg-purple-500 hover:bg-purple-600 text-white"
-                      disabled={balance < reward.cost}
+                      disabled={balance < reward.cost || isRedeeming}
                     >
-                      <Gift className="w-4 h-4 mr-2" />
-                      Redeem Reward
+                      {isRedeeming ? (
+                        <Loader className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Gift className="w-4 h-4 mr-2" />
+                      )}
+                      {isRedeeming ? 'Redeeming...' : 'Redeem Reward'}
                     </Button>
                   )}
                 </div>
