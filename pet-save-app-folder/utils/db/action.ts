@@ -28,7 +28,7 @@ export async function createReport(
   breed: string,
   weight: string,
   imageUrl?: string,
-  type?: string,
+  // type?: string,
   verificationResult?: any
 ) {
   try {
@@ -56,7 +56,7 @@ export async function createReport(
     // Create a notification for the user
     await createNotification(
       userId,
-      `You've earned ${pointsEarned} points for reporting waste!`,
+      `You've earned ${pointsEarned} points for reporting a pet!`,
       'reward'
     );
 
@@ -115,7 +115,7 @@ export async function updateRewardPoints(userId: number, pointsToAdd: number) {
   }
 }
 
-export async function createcollectedPets(reportId: number, collectorId: number, notes?: string) {
+export async function createCollectedPets(reportId: number, collectorId: number, notes?: string) {
   try {
     const [collectedPets] = await db
       .insert(CollectedPets)

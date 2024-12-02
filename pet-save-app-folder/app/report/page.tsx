@@ -9,13 +9,13 @@ import { createUser, getUserByEmail, createReport, getRecentReports } from '@/ut
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast'
 
-const geminiApiKey = process.env.GEMINI_API_KEY as any;
-const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
+const geminiApiKey = 'AIzaSyDJYd2EEOkWFKTpv5In4eGiw2gVHl2TPvA';
+const googleMapsApiKey = 'AIzaSyATUmvONcmrKNE1EGpUk3G9huoL3SgzphY';
 
 const libraries: Libraries = ['places'];
 
 export default function ReportPage() {
-  const [user, setUser] = useState<{ id: number; email: string; name: string } | null>(null);
+  const [user, setUser] = useState("") as any;    //<{ id: number; email: string; name: string } | null>(null);
   const router = useRouter();
   const [isPageLoading, setIsPageLoading] = useState(true);
 
@@ -122,7 +122,7 @@ export default function ReportPage() {
         Respond in JSON format without any markdown formatting or code blocks like this:
         {
           "breed": "type of pet",
-          "weight: "estimated weight with unit as a single number",
+          "weight: "estimated weight with unit in lb",
           "confidence": confidence level as a number between 0 and 1
         }`;
 
@@ -182,7 +182,9 @@ export default function ReportPage() {
         createdAt: report.createdAt.toISOString().split('T')[0]
       };
       
-      setReports([formattedReport, ...reports]);
+      setReports([formattedReport, ...reports]);  // append the new report to the list of reports from databvase
+      
+      // update states after successful submission
       setNewReport({ location: '', breed: '', weight: '' });
       setFile(null);
       setPreview(null);
@@ -203,8 +205,10 @@ export default function ReportPage() {
     const checkUser = async () => {
       try {
         const email = localStorage.getItem('userEmail');
+
+        // timestamp 4:55:49 suggests something different
         if (!email) {
-          router.push('/login');
+          router.push('/'); //redirect to homepage original was => ('/login');
           return;
         }
 
@@ -213,9 +217,9 @@ export default function ReportPage() {
           currentUser = await createUser(email, 'Anonymous User');
         }
         setUser(currentUser);
-        
+        //Up untill here
         const recentReports = await getRecentReports();
-        const formattedReports = recentReports.map(report => ({
+        const formattedReports = recentReports.map((report: any) => ({
           ...report,
           createdAt: report.createdAt.toISOString().split('T')[0]
         }));

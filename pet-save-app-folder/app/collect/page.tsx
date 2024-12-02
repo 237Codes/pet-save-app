@@ -13,8 +13,8 @@ const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY
 type CollectionTask = {
   id: number
   location: string
-  wasteType: string
-  amount: string
+  breed: string
+  weight: string
   status: 'pending' | 'in_progress' | 'completed' | 'verified'
   date: string
   collectorId: number | null
@@ -25,7 +25,7 @@ const ITEMS_PER_PAGE = 5
 export default function CollectPage() {
   const [tasks, setTasks] = useState<CollectionTask[]>([])
   const [loading, setLoading] = useState(true)
-  const [hoveredWasteType, setHoveredWasteType] = useState<string | null>(null)
+  const [hoveredbreed, setHoveredbreed] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [user, setUser] = useState<{ id: number; email: string; name: string } | null>(null)
@@ -67,15 +67,15 @@ export default function CollectPage() {
   const [verificationImage, setVerificationImage] = useState<string | null>(null)
   const [verificationStatus, setVerificationStatus] = useState<'idle' | 'verifying' | 'success' | 'failure'>('idle')
   const [verificationResult, setVerificationResult] = useState<{
-    wasteTypeMatch: boolean;
-    quantityMatch: boolean;
+    breedMatch: boolean;
+    weightMatch: boolean;
     confidence: number;
   } | null>(null)
   const [reward, setReward] = useState<number | null>(null)
 
   const handleStatusChange = async (taskId: number, newStatus: CollectionTask['status']) => {
     if (!user) {
-      toast.error('Please log in to collect waste.')
+      toast.error('Please log in to collect pet.')
       return
     }
 
@@ -133,15 +133,15 @@ export default function CollectPage() {
         },
       ]
 
-      const prompt = `You are an expert in waste management and recycling. Analyze this image and provide:
-        1. Confirm if the waste type matches: ${selectedTask.wasteType}
-        2. Estimate if the quantity matches: ${selectedTask.amount}
+      const prompt = `You are an expert in pet management and recycling. Analyze this image and provide:
+        1. Confirm if the pet type matches: ${selectedTask.breed}
+        2. Estimate if the weight matches: ${selectedTask.weight}
         3. Your confidence level in this assessment (as a percentage)
         
         Respond in JSON format like this:
         {
-          "wasteTypeMatch": true/false,
-          "quantityMatch": true/false,
+          "breedMatch": true/false,
+          "weightMatch": true/false,
           "confidence": confidence level as a number between 0 and 1
         }`
 
@@ -152,20 +152,20 @@ export default function CollectPage() {
       try {
         const parsedResult = JSON.parse(text)
         setVerificationResult({
-          wasteTypeMatch: parsedResult.wasteTypeMatch,
-          quantityMatch: parsedResult.quantityMatch,
+          breedMatch: parsedResult.breedMatch,
+          weightMatch: parsedResult.weightMatch,
           confidence: parsedResult.confidence
         })
         setVerificationStatus('success')
         
-        if (parsedResult.wasteTypeMatch && parsedResult.quantityMatch && parsedResult.confidence > 0.7) {
+        if (parsedResult.breedMatch && parsedResult.weightMatch && parsedResult.confidence > 0.7) {
           await handleStatusChange(selectedTask.id, 'verified')
           const earnedReward = Math.floor(Math.random() * 50) + 10 // Random reward between 10 and 59
           
           // Save the reward
           await saveReward(user.id, earnedReward)
 
-          // Save the collected waste
+          // Save the collected pet
           await saveCollectedPet(selectedTask.id, user.id, parsedResult)
 
           setReward(earnedReward)
@@ -174,7 +174,7 @@ export default function CollectPage() {
             position: 'top-center',
           })
         } else {
-          toast.error('Verification failed. The collected waste does not match the reported waste.', {
+          toast.error('Verification failed. The collected pet does not match the reported pet.', {
             duration: 5000,
             position: 'top-center',
           })
@@ -186,7 +186,7 @@ export default function CollectPage() {
         setVerificationStatus('failure')
       }
     } catch (error) {
-      console.error('Error verifying waste:', error)
+      console.error('Error verifying pet:', error)
       setVerificationStatus('failure')
     }
   }
@@ -238,21 +238,21 @@ export default function CollectPage() {
                   <div className="flex items-center relative">
                     <Trash2 className="w-4 h-4 mr-2 text-gray-500" />
                     <span 
-                      onMouseEnter={() => setHoveredWasteType(task.wasteType)}
-                      onMouseLeave={() => setHoveredWasteType(null)}
+                      onMouseEnter={() => setHoveredbreed(task.breed)}
+                      onMouseLeave={() => setHoveredbreed(null)}
                       className="cursor-pointer"
                     >
-                      {task.wasteType.length > 8 ? `${task.wasteType.slice(0, 8)}...` : task.wasteType}
+                      {task.breed.length > 8 ? `${task.breed.slice(0, 8)}...` : task.breed}
                     </span>
-                    {hoveredWasteType === task.wasteType && (
+                    {hoveredbreed === task.breed && (
                       <div className="absolute left-0 top-full mt-1 p-2 bg-gray-800 text-white text-xs rounded shadow-lg z-10">
-                        {task.wasteType}
+                        {task.breed}
                       </div>
                     )}
                   </div>
                   <div className="flex items-center">
                     <Weight className="w-4 h-4 mr-2 text-gray-500" />
-                    {task.amount}
+                    {task.weight}
                   </div>
                   <div className="flex items-center">
                     <Calendar className="w-4 h-4 mr-2 text-gray-500" />
@@ -274,7 +274,7 @@ export default function CollectPage() {
                     <span className="text-yellow-600 text-sm font-medium">In progress by another collector</span>
                   )}
                   {task.status === 'verified' && (
-                    <span className="text-green-600 text-sm font-medium">Reward Earned</span>
+                    <span className="text-purple-600 text-sm font-medium">Reward Earned</span>
                   )}
                 </div>
               </div>
@@ -344,9 +344,9 @@ export default function CollectPage() {
               ) : 'Verify Pet'}
             </Button>
             {verificationStatus === 'success' && verificationResult && (
-              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
-                <p>Waste Type Match: {verificationResult.wasteTypeMatch ? 'Yes' : 'No'}</p>
-                <p>Quantity Match: {verificationResult.quantityMatch ? 'Yes' : 'No'}</p>
+              <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-md">
+                <p>pet Type Match: {verificationResult.breedMatch ? 'Yes' : 'No'}</p>
+                <p>weight Match: {verificationResult.weightMatch ? 'Yes' : 'No'}</p>
                 <p>Confidence: {(verificationResult.confidence * 100).toFixed(2)}%</p>
               </div>
             )}
@@ -364,7 +364,7 @@ export default function CollectPage() {
       {/* {user ? (
         <p className="text-sm text-gray-600 mb-4">Logged in as: {user.name}</p>
       ) : (
-        <p className="text-sm text-red-600 mb-4">Please log in to collect waste and earn rewards.</p>
+        <p className="text-sm text-red-600 mb-4">Please log in to collect pet and earn rewards.</p>
       )} */}
     </div>
   )
@@ -375,7 +375,7 @@ function StatusBadge({ status }: { status: CollectionTask['status'] }) {
   const statusConfig = {
     pending: { color: 'bg-yellow-100 text-yellow-800', icon: Clock },
     in_progress: { color: 'bg-blue-100 text-blue-800', icon: Trash2 },
-    completed: { color: 'bg-green-100 text-green-800', icon: CheckCircle },
+    completed: { color: 'bg-purple-100 text-purple-800', icon: CheckCircle },
     verified: { color: 'bg-purple-100 text-purple-800', icon: CheckCircle },
   }
 
