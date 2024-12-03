@@ -9,14 +9,14 @@
 </ol>
 
 ## Brief Description
-A Pet Save Platform which is a community-driven app where users can report lost and found pets, helping reunite them with their owners. Users can upload photos, and specify details such as breed and last seen location, and the platform uses AI to classify pets by species and estimate their weight and breed. The app also provides a matching system that suggests potential connections between lost and found pets based on image analysis. Users earn rewards for reporting pets and successfully helping to reunite them with their owners, incentivizing engagement. The platform aims to streamline the process of finding lost pets and offering assistance.
+A Pet Save Platform which is a community-driven app where users can report lost and found pets, helping reunite them with their owners. Users can upload photos, and last seen location, and the platform uses AI to classify pets by species and estimate their weight and breed. The app also provides a matching system that suggests potential connections between lost and found pets based on image analysis. Users earn rewards for reporting pets and successfully helping to reunite them with their owners, incentivizing engagement. The platform aims to streamline the process of finding lost pets and offering assistance.
 
  
 
 ## Core Features:
 
 ### Report Lost Pets:
-1. Users can submit reports of their lost pets, including photos, the pet’s species, breed, last known location, and estimated weight.
+1. Users can submit reports of their lost pets, including photos, and last known location
 2. The system stores these reports and makes them available for viewing by others.
 ### Report Found Pets:
 1. Users who find a pet can upload details and photos of the animal, including where they found the pet.
@@ -34,7 +34,7 @@ Users can search for pets based on location, breed, or other attributes.
 ## User Flow:
 
 ### Lost Pet Submission:
-1. User uploads a photo, selects species, breed, and enters details (location, weight, etc.).
+1. User uploads a photo, and enters location.
 2. AI analyzes the image to classify the pet and provide further data for the report.
 ### Found Pet Submission:
 1. User uploads a photo of the found pet and adds details.
