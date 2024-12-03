@@ -68,11 +68,11 @@ First use need to install Next.js by using this command on the terminal to insta
 
 Command:  
 
-npm install 
+	npm install 
 
-npm install next@latest 
+	npm install next@latest 
 
-npm install next react react-dom 
+	npm install next react react-dom 
 
 Then use the Command to run project on localhost to see the web view. 
 
@@ -86,7 +86,7 @@ Command:
 
 	npm install drizzle-kit --save-dev 
 
-npm install pg @neondatabase/serverless 
+	npm install pg @neondatabase/serverless 
 
  
 If you make any changes on data base you need to update it. 
