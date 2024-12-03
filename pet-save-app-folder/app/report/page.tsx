@@ -10,8 +10,8 @@ import { createUser, getUserByEmail, createReport, getRecentReports } from '@/ut
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast'
 
-const geminiApiKey = 'AIzaSyDJYd2EEOkWFKTpv5In4eGiw2gVHl2TPvA';
-const googleMapsApiKey = 'AIzaSyATUmvONcmrKNE1EGpUk3G9huoL3SgzphY';
+const geminiApiKey = process.env.GEMINI_API_KEY;
+const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 const libraries: Libraries = ['places'];
 
@@ -107,7 +107,7 @@ export default function ReportPage() {
     setVerificationStatus('verifying')
     
     try {
-      const genAI = new GoogleGenerativeAI(geminiApiKey);
+      const genAI = new GoogleGenerativeAI(geminiApiKey as string);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); //specify model to use for pet verification
 
       const base64Data = await readFileAsBase64(file);
