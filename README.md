@@ -45,4 +45,54 @@ Users can search for pets based on location, breed, or other attributes.
 ### Account Authentication:
 1. A user can log in, sign up, or continue as a guest.
 2. Once authenticated, users can manage their account settings, including updating their email and changing their password.
+
+### A script to install all the necessary packages. 
+This script explains how you can use this project in your local system. There are some important libraries/packages and dependencies which need to be installed. 
+
+### Step1:  
+Install visual studio 
+Then you need to clone this project from GitHubtHub locally ton your device.
+
+### Step 2:
+You need to create some API keys by yourself and add those links in .env file so make sure all module will perfom well. 
+
+### Some important platforms for KEYs needed. 
+Gemini API 
+Google Map API 
+Neon project linking key 
+Web3Auth 
+
+### Then you need to open your terminal on visual studio and use the command “npm install’ it will automatically install all the dependencies in your system. In case these do not work you can run and install the necessary packages one by one by following this manual. 
+
+First use need to install Next.js by using this command on the terminal to install. 
+Command:  
+
+npm install 
+
+npm install next@latest 
+
+npm install next react react-dom 
+
+Then use the Command to run project on localhost to see the web view. 
+
+Command:  
+
+	npm run dev 
+
+Also you need to install the Drizzle ORM database setup in the project. And neon database setup for using the postgreSQL database. 
+
+Command: 
+
+	npm install drizzle-kit --save-dev 
+
+npm install pg @neondatabase/serverless 
+
+ 
+If you make any changes on data base you need to update it. 
+
+Command:  
+
+	npm run db:push 
+
+ 
  
