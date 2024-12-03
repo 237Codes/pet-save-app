@@ -57,10 +57,7 @@ Then you need to clone this project from GitHubtHub locally ton your device.
 You need to create some API keys by yourself and add those links in .env file so make sure all module will perfom well. 
 
 ### Some important platforms for KEYs needed. 
-Gemini API 
-Google Map API 
-Neon project linking key 
-Web3Auth 
+Gemini API, Google Map API, Neon project linking key, Web3Auth 
 
 ### Then you need to open your terminal on visual studio and use the command “npm install’ it will automatically install all the dependencies in your system. In case these do not work you can run and install the necessary packages one by one by following this manual. 
 
