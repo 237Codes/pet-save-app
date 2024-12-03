@@ -65,6 +65,7 @@ Web3Auth
 ### Then you need to open your terminal on visual studio and use the command “npm install’ it will automatically install all the dependencies in your system. In case these do not work you can run and install the necessary packages one by one by following this manual. 
 
 First use need to install Next.js by using this command on the terminal to install. 
+
 Command:  
 
 npm install 
